@@ -84,13 +84,13 @@ elif test -d $cache_dir/node/node_modules; then
 
 fi
 
+if [ -d "$env_dir" ]; then
+  status "Exporting config vars to environment"
+  export_env_dir $env_dir
+fi
+
 # Scope config var availability only to `npm install`
 (
-  if [ -d "$env_dir" ]; then
-    status "Exporting config vars to environment"
-    export_env_dir $env_dir
-  fi
-
   status "Clearing NPM cache"
   rm -rf $build_dir/.npm
   rm -rf /app/.npm
@@ -144,10 +144,7 @@ fi
 # Update the PATH
 status "Building runtime environment"
 mkdir -p $build_dir/.profile.d
-echo "export PATH=\"\$HOME/vendor/node/bin:\$HOME/bin:\$HOME/node_modules/.bin:\$PATH\";" > $build_dir/.profile.d/nodejs.sh
-
-# Install jspm locally
-npm install jspm
+echo "export PATH=\"\$HOME/.heroku/node/bin:\$HOME/bin:\$HOME/node_modules/.bin:\$PATH\"" > $build_dir/.profile.d/nodejs.sh
 
 # Install jspm dependencies
 $build_dir/node_modules/.bin/jspm install
@@ -155,14 +152,6 @@ $build_dir/node_modules/.bin/jspm install
 # Check and run gulp
 (
   if [ -f $build_dir/gulpfile.js ]; then
-    # get the env vars
-    if [ -d "$env_dir" ]; then
-      status "Exporting config vars to environment"
-      export_env_dir $env_dir
-    fi
-
-    # Install gulp locally
-    npm install gulp
     echo "-----> Found gulpfile, running gulp heroku task"
     $build_dir/node_modules/.bin/gulp heroku
   else
