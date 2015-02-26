@@ -90,16 +90,14 @@ if [ -d "$env_dir" ]; then
 fi
 
 # Scope config var availability only to `npm install`
-(
-  status "Clearing NPM cache"
-  rm -rf $build_dir/.npm
-  rm -rf /app/.npm
-  npm cache clear
+status "Clearing NPM cache"
+rm -rf $build_dir/.npm
+rm -rf /app/.npm
+npm cache clear
 
-  status "Installing dependencies"
-  # Make npm output to STDOUT instead of its default STDERR
-  npm install --userconfig $build_dir/.npmrc --production 2>&1 | indent
-)
+status "Installing dependencies"
+# Make npm output to STDOUT instead of its default STDERR
+npm install --userconfig $build_dir/.npmrc --production 2>&1 | indent
 
 # Persist goodies like node-version in the slug
 mkdir -p $build_dir/.heroku
@@ -150,11 +148,9 @@ echo "export PATH=\"\$HOME/vendor/node/bin:\$HOME/bin:\$HOME/node_modules/.bin:\
 $build_dir/node_modules/.bin/jspm install
 
 # Check and run gulp
-(
-  if [ -f $build_dir/gulpfile.js ]; then
-    echo "-----> Found gulpfile, running gulp heroku task"
-    $build_dir/node_modules/.bin/gulp heroku
-  else
-    echo "-----> No gulpfile found"
-  fi
-)
+if [ -f $build_dir/gulpfile.js ]; then
+  echo "-----> Found gulpfile, running gulp heroku task"
+  $build_dir/node_modules/.bin/gulp heroku
+else
+  echo "-----> No gulpfile found"
+fi
